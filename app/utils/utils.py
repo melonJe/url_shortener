@@ -24,6 +24,3 @@ def base62_encode(num: int) -> str:
         base62.append(base62_chars[rem])
     return ''.join(reversed(base62))
 
-
-def generate_short_key(url: str) -> str:
-    return base62_encode(int(hashlib.sha256((url + os.urandom(16).hex()).encode()).hexdigest()[:12], 16))

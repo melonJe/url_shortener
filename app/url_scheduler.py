@@ -1,3 +1,4 @@
+import time
 from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -43,3 +44,15 @@ def start_url_scheduler():
     scheduler.add_job(sync_access_counts, 'interval', minutes=5)  # 5분마다 Redis 카운트를 PostgreSQL에 반영
     scheduler.start()
     print("Scheduler started.")
+
+    try:
+        # 스케줄러가 백그라운드에서 계속 실행되도록 프로세스를 유지합니다.
+        while True:
+            time.sleep(60)
+    except (KeyboardInterrupt, SystemExit):
+        scheduler.shutdown()
+        print("Scheduler stopped.")
+
+
+if __name__ == "__main__":
+    start_url_scheduler()

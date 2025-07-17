@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.database import dtos
 from app.database.postgres import get_db
 from app.service import url_service
-from app.url_scheduler import start_url_scheduler
+
 
 # 애플리케이션 생성
 app = FastAPI(
@@ -18,10 +18,6 @@ app = FastAPI(
     },
 )
 
-
-@app.on_event("startup")
-def on_startup():
-    start_url_scheduler()
 
 
 @app.post("/shorten", response_model=dtos.ShortUrlResponse, summary="Create a short URL", tags=["URL Shortener"])
@@ -49,8 +45,8 @@ def get_original_url(short_key: str, db: Session = Depends(get_db)):
     original_url = url_service.get_original_url(db, short_key)
     if original_url is None:
         raise HTTPException(status_code=404, detail="URL not found")
-    url_service.increment_access_count(short_key)
-    response = RedirectResponse(url=original_url, status_code=301)
+    url_service.increment_access_count(db, short_key)
+        response = RedirectResponse(url=original_url, status_code=302)
     # response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     # response.headers["Pragma"] = "no-cache"
     return response

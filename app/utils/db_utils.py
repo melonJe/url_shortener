@@ -14,16 +14,6 @@ def fetch_url_from_db(db: Session, short_key: str) -> models.URL | None:
     return None
 
 
-def is_duplicate_short_key(db: Session, short_key: str) -> bool:
-    try:
-        cached_url = redis_client.get(f"url:{short_key}")
-        if cached_url:
-            return True
-        return db.query(exists().where(models.URL.short_key == short_key)).scalar()
-    except Exception as e:
-        print(f"An error occurred while checking for duplicate short key: {e}")
-        return True
-
 
 def get_existing_short_key(db: Session, original_url: str) -> str | None:
     try:
